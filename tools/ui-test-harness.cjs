@@ -33,7 +33,7 @@ function setup({ mixer = false, roll = false, knobs = false, plugins = false, ch
   const dummy = new Element('dummy'); dummy.append({ textContent: '' });
   const document = { createElement: tag => new Element(tag), createElementNS: (ns, tag) => new Element(tag), createTextNode: text => ({ nodeType: 3, textContent: String(text) }), querySelector: () => dummy, querySelectorAll: () => [], body: new Element('body') };
   const context = vm.createContext({
-    document, window: { innerWidth: 1600, innerHeight: 900 }, location: { search: '' }, URLSearchParams, performance, setTimeout, clearTimeout,
+    document, window: Object.assign(new Element('window'), { innerWidth: 1600, innerHeight: 900 }), location: { search: '' }, URLSearchParams, performance, setTimeout, clearTimeout,
     requestAnimationFrame() {}, ResizeObserver: class { constructor(fn) { this.fn = fn; } observe() { this.fn(); } },
     localStorage: { getItem: k => storage.get(k), setItem: (k, v) => storage.set(k, v) },
     WM: { create: () => ({ open: true, show() {}, tools: new Element('tools'), body: new Element('body'), sub: new Element('span') }) },

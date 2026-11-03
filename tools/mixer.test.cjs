@@ -102,3 +102,50 @@ test('each mixer strip switches its own effects off and on', () => {
   s.undo();
   assert.equal(s.S.project.mixer[2].fx_off, false);
 });
+
+test('Shift+wheel moves the same effect across slots and keeps its mix and bypass settings', () => {
+  const s = setup({ mixer: true });
+  s.S.project.mixer[1].fx = [
+    { pid: 1, on: true, mix: 0.2 },
+    { pid: 2, on: false, mix: 0.4 },
+    { pid: 3, on: true, mix: 0.6 },
+  ];
+  s.Mixer.select(1);
+  const list = () => s.elements.find(e => e.className === 'mx-side').querySelector('.mx-slots');
+  const order = () => Array.from(s.S.project.mixer[1].fx, f => f.pid);
+  const wheel = (slot, event) => {
+    list().children[slot].emit('wheel', { clientX: 40, clientY: 50, ...event });
+    s.bus.emit('render');
+  };
+
+  list().scrollTop = 14;
+  wheel(0, { shiftKey: true, deltaY: 120 });
+  assert.deepEqual(order(), [2, 1, 3]);
+  assert.equal(list().scrollTop, 14);
+  // Chromium can report Shift+wheel on the horizontal axis. The pointer still sits in slot 0.
+  wheel(0, { shiftKey: true, deltaX: 120 });
+  assert.deepEqual(order(), [2, 3, 1]);
+  wheel(0, { shiftKey: true, deltaY: 120 });
+  assert.deepEqual(order(), [2, 3, 1], 'the last slot does not wrap');
+  wheel(0, { shiftKey: true, deltaY: -120 });
+  assert.deepEqual(order(), [2, 1, 3]);
+
+  s.elements.find(e => e.tag === 'window').emit('keyup', { key: 'Shift', shiftKey: false });
+  let stopped = false;
+  wheel(0, {
+    shiftKey: true, deltaY: 120, target: list().children[0].children[2],
+    stopPropagation() { stopped = true; },
+  });
+  assert.ok(stopped, 'Shift+wheel over the knob is intercepted by its row');
+  assert.deepEqual(order(), [1, 2, 3]);
+  assert.equal(s.S.project.mixer[1].fx[1].on, false);
+  assert.equal(s.S.project.mixer[1].fx[1].mix, 0.4);
+  s.undo();
+  assert.deepEqual(order(), [2, 1, 3]);
+  s.redo();
+  assert.deepEqual(order(), [1, 2, 3]);
+
+  wheel(0, { deltaY: -120, target: { closest: () => null } });
+  assert.deepEqual(order(), [1, 2, 3]);
+  assert.equal(s.S.project.mixer[1].fx[0].mix, 0.225);
+});

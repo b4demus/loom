@@ -4,6 +4,7 @@
 const Mixer = (() => {
   let win, stripsEl, side, allOff;
   let sel = 0;
+  let wheelMove = null;
   const strips = []; // per track: {el, cap, mL, mR, db, pan, mute, solo, name, fx, lvl: [l, r]}
 
   function place() {
@@ -19,7 +20,13 @@ const Mixer = (() => {
     side = h('div', { class: 'mx-side' });
     win.body.append(h('div', { class: 'mixer' }, makeCurrent(), stripsEl, side));
     bus.on('render', render);
-    bus.on('restore', () => { sideSig = ''; });
+    bus.on('restore', () => { sideSig = ''; wheelMove = null; });
+    side.addEventListener('pointermove', e => {
+      if (wheelMove && (e.clientX !== wheelMove.x || e.clientY !== wheelMove.y)) wheelMove = null;
+    });
+    side.addEventListener('pointerleave', () => { wheelMove = null; });
+    window.addEventListener('keyup', e => { if (e.key === 'Shift' && !e.shiftKey) wheelMove = null; });
+    window.addEventListener('blur', () => { wheelMove = null; });
     new ResizeObserver(relayout).observe(stripsEl);
   }
   // a resized window: the caps, the meter colours and the scale follow the new height
@@ -88,7 +95,7 @@ const Mixer = (() => {
     const was = sel;
     sel = clamp(i, 0, mix().length - 1);
     // the scale strip follows the selection: its peaks start over
-    if (sel !== was) { cur.peak = 0; cur.hold = [0, 0]; cur.lvl = [0, 0]; showPeak(); }
+    if (sel !== was) { wheelMove = null; cur.peak = 0; cur.hold = [0, 0]; cur.lvl = [0, 0]; showPeak(); }
     render();
   }
 
@@ -314,14 +321,22 @@ const Mixer = (() => {
     ]);
   }
 
+  function moveEffect(i, pid, step) {
+    const fx = mix()[i].fx;
+    const from = fx.findIndex(f => f.pid === pid);
+    const to = from + step;
+    if (from < 0 || to < 0 || to >= fx.length) return;
+    history.edit(() => { [fx[from], fx[to]] = [fx[to], fx[from]]; });
+  }
+
   function slotMenu(i, k, x, y) {
     const f = mix()[i].fx[k];
     menu(x, y, [
       { label: t('fx.open'), fn: () => Plugins.openEditor(f.pid) },
       { label: f.on ? t('fx.bypass') : t('fx.enable'), fn: () => history.edit(() => { f.on = !f.on; }) },
       { label: t('au.param'), fn: () => Playlist.chooseParam(f.pid, x, y, (tg, name) => Playlist.showLane(tg, name), true) },
-      k > 0 && { label: t('ch.up'), fn: () => history.edit(() => { const a = mix()[i].fx; [a[k - 1], a[k]] = [a[k], a[k - 1]]; }) },
-      k < mix()[i].fx.length - 1 && { label: t('ch.down'), fn: () => history.edit(() => { const a = mix()[i].fx; [a[k + 1], a[k]] = [a[k], a[k + 1]]; }) },
+      k > 0 && { label: t('ch.up'), fn: () => moveEffect(i, f.pid, -1) },
+      k < mix()[i].fx.length - 1 && { label: t('ch.down'), fn: () => moveEffect(i, f.pid, 1) },
       '-',
       { label: t('ch.delete'), danger: true, fn: () => history.edit(() => { mix()[i].fx.splice(k, 1); Plugins.collect(); }) },
     ]);
@@ -337,7 +352,7 @@ const Mixer = (() => {
   }
 
   // rebuilt only when what it shows changes: a rebuild under the pointer would eat clicks and drags
-  let sideSig = '', sideKnobs = [];
+  let sideSig = '', sideKnobs = [], sideTrack = -1;
   function renderSide() {
     const m = mix()[sel];
     if (!m) return;
@@ -345,6 +360,8 @@ const Mixer = (() => {
     if (sig === sideSig) { sideKnobs.forEach(k => k.update()); return; }
     sideSig = sig;
     sideKnobs = [];
+    const scrollTop = sideTrack === sel ? side.querySelector('.mx-slots')?.scrollTop ?? 0 : 0;
+    sideTrack = sel;
     side.innerHTML = '';
     const i = sel;
     const copyBtn = h('button', { class: 'tool', 'data-hint': 'hint.mxcopy', disabled: !m.fx.length, onclick: () => copyChain(i) }, icon('copy'), t('mx.copy'));
@@ -370,19 +387,30 @@ const Mixer = (() => {
       // the whole row opens the plugin's window; the square and the knob keep their own jobs
       row.addEventListener('click', e => { if (!e.target.closest('.knob, .rk-mute')) Plugins.openEditor(f.pid); });
       row.addEventListener('contextmenu', e => { e.preventDefault(); slotMenu(sel, k, e.clientX, e.clientY); });
-      // The wheel over a slot turns its wet knob (as over the knob itself) instead of scrolling
-      // the list, which made the slots slide up and down under the pointer.
       row.addEventListener('wheel', e => {
-        if (e.target.closest('.knob')) return;
+        if (e.shiftKey) {
+          // Capture Shift+wheel before the knob, and keep moving the same effect after rows swap.
+          e.preventDefault();
+          e.stopPropagation();
+          const step = Math.sign(e.deltaY || e.deltaX || 0);
+          if (!step) return;
+          if (!wheelMove || wheelMove.x !== e.clientX || wheelMove.y !== e.clientY) {
+            wheelMove = { pid: f.pid, x: e.clientX, y: e.clientY };
+          }
+          moveEffect(i, wheelMove.pid, step);
+          return;
+        }
+        wheelMove = null;
+        if (!e.deltaY || e.target.closest('.knob')) return;
         e.preventDefault();
         const fx = current();
         if (!fx) return;
-        const v = clamp((fx.mix ?? 1) + (e.deltaY < 0 ? 1 : -1) * (e.shiftKey ? 0.005 : 0.025), 0, 1);
+        const v = clamp((fx.mix ?? 1) + (e.deltaY < 0 ? 0.025 : -0.025), 0, 1);
         Auto.touch(wetTg);
         history.edit(() => { fx.mix = v; });
         wet.update();
         hintValue(t('fx.mix'), Math.round(v * 100) + '%');
-      }, { passive: false });
+      }, { capture: true, passive: false });
       list.append(row);
     });
     if (m.fx.length < MAX_FX) {
@@ -391,6 +419,7 @@ const Mixer = (() => {
       list.append(add);
     }
     side.append(list);
+    list.scrollTop = scrollTop;
   }
 
   let built = -1;

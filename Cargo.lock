@@ -1997,7 +1997,7 @@ checksum = "5d15f86d12da44cd8d4ec3c73984537eb7f4cadcb9776a575a0a8a05ca11005c"
 
 [[package]]
 name = "loom"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "asio-sys",
  "cpal",
@@ -2015,7 +2015,7 @@ dependencies = [
 
 [[package]]
 name = "loom-engine"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "hound",
  "serde",
@@ -2025,7 +2025,7 @@ dependencies = [
 
 [[package]]
 name = "loom-host"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "libloading 0.8.9",
  "loom-engine",
@@ -2037,7 +2037,7 @@ dependencies = [
 
 [[package]]
 name = "loom-stems"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "hound",
  "loom-engine",

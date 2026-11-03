@@ -32,7 +32,7 @@ Loom settings, the plugin scan cache and downloaded models travel with the extra
 | --- | --- |
 | **Sequence** | Program drums in the channel rack, write notes in the piano roll and arrange patterns and audio clips in the playlist. |
 | **Play and record** | Use the built-in synth, sampler and drum kit. Record audio and notes, monitor inputs and route audio through the mixer. |
-| **Mix** | Host 64-bit VST2 and VST3 instruments and effects, build insert chains and adjust each effect’s dry/wet mix. |
+| **Mix** | Host 64-bit VST2 and VST3 instruments and effects. Use **Shift + mouse wheel** over an effect to move it up or down the insert chain. |
 | **Edit and export** | Edit clips, import and export MIDI, save `.loom` projects and render 24-bit WAV. |
 | **Split stems** | Use an audio clip’s menu to separate vocals, drums, bass and other instruments on the CPU. The first run downloads the 316 MB HTDemucs model. Inference runs locally and works offline after that. |
 
