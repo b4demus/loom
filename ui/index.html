@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>loom</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="field" class="gl-field"><canvas></canvas></div>
+
+  <header class="top" data-tauri-drag-region>
+    <button class="logo" id="v-settings" data-view="settings" data-hint="hint.settings"><span class="logo-mark"><svg viewBox="0 0 13 16" aria-hidden="true"><path fill="currentColor" d="M5 1.2h1.7v9.6a3 3 0 1 1-1.7-2.7V1.2zM6.7 1.2c1.2 1.3 3.9 2 4.6 4.3.4 1.4-.1 2.8-.9 3.6.3-1.6-.1-3.1-3.7-4.4V1.2z"/></svg></span><span class="logo-word">loom</span></button>
+    <button class="gl-btn gl-btn-ghost gl-btn-sm" id="f-menu" data-i18n="file" data-hint="hint.file"></button>
+    <div class="grow" data-tauri-drag-region></div>
+    <div class="transport">
+      <div class="seg compact" id="mode">
+        <button data-mode="pat" data-i18n="mode.pat" data-hint="hint.modePat"></button>
+        <button data-mode="song" data-i18n="mode.song" data-hint="hint.modeSong"></button>
+      </div>
+      <button class="tbtn" id="t-play" data-hint="hint.play"><span>&gt;</span></button>
+      <button class="tbtn" id="t-stop" data-hint="hint.stop"><span>■</span></button>
+      <button class="tbtn" id="t-rec" data-hint="hint.rec"><span>●</span></button>
+      <button class="tbtn" id="t-met" data-hint="hint.met"><span>△</span></button>
+      <button class="tbtn scale" id="t-scale" data-hint="hint.scalekeys"><span class="sc-lbl" data-i18n="scale.keys"></span><b id="t-scale-val">—</b></button>
+      <div class="readout" id="bpm" data-hint="hint.bpm"><span class="ro-label">bpm</span><span class="ro-val" id="bpm-val">130.0</span></div>
+      <div class="readout pos" id="pos" data-hint="hint.pos"><span class="ro-val" id="pos-val">1:1:1</span><span class="ro-sub" id="pos-time">0:00.0</span></div>
+      <div class="kn-master" id="master" data-hint="hint.master"></div>
+      <div class="meter" id="meter" data-hint="hint.meter"><div class="mrow" id="m-l"></div><div class="mrow" id="m-r"></div></div>
+    </div>
+    <div class="grow" data-tauri-drag-region></div>
+    <nav class="views">
+      <button class="vbtn" id="v-browser" data-hint="hint.browser"><span class="vg"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3.5" width="11" height="9"/><path d="M6.5 3.5v9"/></svg></span><span data-i18n="w.browser"></span></button>
+      <button class="vbtn" data-view="playlist" data-hint="hint.playlist"><span class="vg"><svg viewBox="0 0 16 16" aria-hidden="true"><rect class="f" x="2" y="3" width="8" height="2.5"/><rect class="f" x="6" y="6.75" width="8" height="2.5"/><rect class="f" x="3" y="10.5" width="6" height="2.5"/></svg></span><span data-i18n="w.playlist"></span></button>
+      <button class="vbtn" data-view="rack" data-hint="hint.rack"><span class="vg"><svg viewBox="0 0 16 16" aria-hidden="true"><path class="f" d="M2 3h2.5v2.5H2zM5.5 3H8v2.5H5.5zM9 3h2.5v2.5H9zM12.5 3H15v2.5h-2.5zM2 6.75h2.5v2.5H2zM5.5 6.75H8v2.5H5.5zM9 6.75h2.5v2.5H9zM12.5 6.75H15v2.5h-2.5zM2 10.5h2.5V13H2zM5.5 10.5H8V13H5.5zM9 10.5h2.5V13H9zM12.5 10.5H15V13h-2.5z"/></svg></span><span data-i18n="w.rack"></span></button>
+      <button class="vbtn" data-view="roll" data-hint="hint.roll"><span class="vg"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 2.5v11"/><rect class="f" x="5" y="4" width="4" height="2.5"/><rect class="f" x="8" y="7.5" width="6" height="2.5"/><rect class="f" x="5" y="11" width="3" height="2.5"/></svg></span><span data-i18n="w.roll"></span></button>
+      <button class="vbtn" data-view="mixer" data-hint="hint.mixer"><span class="vg"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11M8 2.5v11M12 2.5v11"/><rect class="f" x="2.5" y="9" width="3" height="2"/><rect class="f" x="6.5" y="4.5" width="3" height="2"/><rect class="f" x="10.5" y="7" width="3" height="2"/></svg></span><span data-i18n="w.mixer"></span></button>
+    </nav>
+    <div class="winctl">
+      <button class="win-btn" id="w-min">_</button>
+      <button class="win-btn" id="w-max">□</button>
+      <button class="win-btn" id="w-close">x</button>
+    </div>
+  </header>
+
+  <aside id="browser" class="browser"></aside>
+  <main id="desk"></main>
+  <footer class="status">
+    <div class="hint" id="hint"></div>
+    <div class="stat" id="stat"></div>
+  </footer>
+  <div class="toast" id="toast"></div>
+
+  <script src="glyph-field.js"></script>
+  <script src="i18n.js"></script>
+  <script src="core.js"></script>
+  <script src="widgets.js"></script>
+  <script src="rack.js"></script>
+  <script src="roll.js"></script>
+  <script src="playlist.js"></script>
+  <script src="stems.js"></script>
+  <script src="panels.js"></script>
+  <script src="plugins.js"></script>
+  <script src="mixer.js"></script>
+  <script src="browser.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

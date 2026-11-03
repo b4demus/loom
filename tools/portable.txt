@@ -1,0 +1,11 @@
+loom · Windows x64 portable
+
+Extract all files into a writable folder and open loom.exe.
+Keep this file next to loom.exe. The data folder stores Loom settings,
+the plugin cache, and downloads. Move the entire folder to keep your setup.
+
+Распакуйте все файлы в папку с правом записи и запустите loom.exe.
+Оставьте этот файл рядом с loom.exe. В папке data хранятся настройки,
+кэш плагинов и загруженные файлы. Переносите папку Loom целиком.
+
+https://github.com/b4demus/loom

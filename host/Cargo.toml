@@ -1,0 +1,26 @@
+[package]
+name = "loom-host"
+description = "loom plugin host: VST2 and VST3 on Windows (scan, instances, editors)"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+
+[dependencies]
+loom-engine = { path = "../engine" }
+vst3 = "0.3"
+libloading = "0.8"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[dependencies.windows-sys]
+version = "0.59"
+features = [
+    "Win32_Foundation",
+    "Win32_UI_WindowsAndMessaging",
+    "Win32_Graphics_Gdi",
+    "Win32_Graphics_Dwm",
+    "Win32_System_LibraryLoader",
+    "Win32_System_Com",
+    "Win32_System_Threading",
+    "Win32_UI_Input_KeyboardAndMouse",
+]

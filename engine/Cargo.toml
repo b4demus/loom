@@ -1,0 +1,15 @@
+[package]
+name = "loom-engine"
+description = "loom audio engine: project model, sequencer, instruments, offline render"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+symphonia = { version = "0.5", default-features = false, features = ["wav", "pcm", "flac", "mp3", "ogg", "vorbis", "aiff"] }
+hound = "3.5"
+
+[dev-dependencies]
+hound = "3.5"

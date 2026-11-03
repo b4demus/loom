@@ -1,0 +1,14 @@
+/target/
+/dist/
+/data/
+/app/gen/
+/.claude/
+/.tools/
+/ui-backup-*/
+/ui-soft/
+/restore-ui.ps1
+/vendor/asio-sys/.cargo-ok
+/vendor/asio-sys/.cargo_vcs_info.json
+__pycache__/
+.env
+.env.*

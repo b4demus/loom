@@ -1,0 +1,16 @@
+HTDemucs standard model: drums, bass, other, vocals.
+Original model: Meta Research, https://github.com/facebookresearch/demucs
+ONNX export: https://huggingface.co/StemSplitio/htdemucs-onnx
+Pinned revision: d54ed9eb60e258ea82131c6ee14578628816456a
+File: htdemucs.onnx (316,446,953 bytes, fp32)
+SHA-256: 68d0bf16428ef66e692cdff8a9ccf28f1ef3f69440d57e58605a4cc55fcc5e74
+
+The distributor's model card declares MIT and identifies this as the standard
+Meta HTDemucs four-stem model exported to ONNX with parity verification.
+The upstream Demucs project is MIT licensed. See demucs-MIT.txt for the notice.
+Model files are downloaded separately on first use; no user audio is uploaded.
+
+Inference runtime: Microsoft ONNX Runtime 1.24.2, CPU only. See
+ONNX-Runtime-MIT.txt and ONNX-Runtime-ThirdPartyNotices.txt.
+Resampling source: demucs-rs / demucs-core, Apache-2.0. See
+demucs-rs-Apache-2.0.txt and vendor/demucs-core/LOOM_PATCHES.md.

@@ -1,0 +1,22 @@
+[workspace]
+resolver = "2"
+members = ["engine", "host", "app", "stems-worker"]
+exclude = ["vendor/demucs-core"]
+
+[patch.crates-io]
+asio-sys = { path = "vendor/asio-sys" }
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["b4demus"]
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 4
+strip = true
+
+# DSP in debug builds is too slow to listen to: keep the engine optimized there too.
+[profile.dev.package.loom-engine]
+opt-level = 3
